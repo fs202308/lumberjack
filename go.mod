@@ -1,4 +1,4 @@
-module github.com/zhengkai02/lumberjack2
+module github.com/fs202308/lumberjack
 
 go 1.16
 
