@@ -1078,3 +1078,32 @@ func getIpFromAddr(addr net.Addr) net.IP {
 
 	return ip
 }
+
+//删除表中某条记录
+func deleteFileMetaInfo(dbStr, tbStr string) error {
+	sql := "DELETE from t_binlog2file_status " +
+		" WHERE db = ? AND tb = ?;"
+	result, err := db.Exec(sql, dbStr, tbStr)
+	if err != nil {
+		return err
+	}
+	if afrs, err := result.RowsAffected(); err != nil || afrs <= 0 {
+		return fmt.Errorf("update file info err: %v . Or affect rows is 0", err)
+	}
+	return nil
+}
+
+//func (l *Logger) Delete() {
+func (l *Logger) Delete() error {
+	// 删除目录
+	err := os.RemoveAll(l.dir())
+	if err != nil {
+		return fmt.Errorf("can't remove directories %s, err %s", l.dir(), err)
+	}
+	// 删除记录
+	err = deleteFileMetaInfo(l.Db, l.Tb)
+	if err != nil {
+		return fmt.Errorf("remove record in db fail, db %s tb %s error %s", l.Db, l.Tb, err)
+	}
+	return nil
+}
